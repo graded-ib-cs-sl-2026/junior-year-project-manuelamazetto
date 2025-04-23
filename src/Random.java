@@ -6,11 +6,15 @@ public class Random {
     private int a;
     private int b;
     private int i;
+    private int min = 0;
+    private int max = 0;
     public int numStudents = 0;
     public Boolean namesLeft = true;
     public String randomizedGroups = "";
     public String currentGroup = "";
-    public String filename = "";
+    public String fileName = "";
+    private String currentName = "";
+    public int leftoverGroup = 0;
     public String[] block = new String[1000];
     // This array is created with 1000 spaces, however most of them will likely be
     // null, not taking up much space
@@ -40,7 +44,7 @@ public class Random {
         i = 0;
         randomizedGroups = "";
         currentGroup = "";
-        int leftoverGroup = numStudents % studentsPerTable;
+        leftoverGroup = numStudents % studentsPerTable;
         /*
          * This for loop is used to cycle through the names int eh array and randomize
          * them. It works by setting the the variable nm as block[c], then giving
@@ -64,7 +68,7 @@ public class Random {
         while (i < numStudents) {
             currentGroup += block[i] + ", ";
             a++;
-            if (a == studentsPerTable && i < numStudents - leftoverGroup - 1) {
+            if (a == studentsPerTable && i < numStudents - leftoverGroup) {
                 randomizedGroups += "Group " + b + ": " + currentGroup;
                 currentGroup = "";
                 a = 0;
@@ -82,7 +86,9 @@ public class Random {
             currentGroup += block[i] + ", ";
             i++;
         }
-        randomizedGroups += "Group " + b + ": " + currentGroup;
+        if (leftoverGroup != 0) {
+            randomizedGroups += "Group " + b + ": " + currentGroup;
+        }
         /*
          * This saves them to the textfile currentRandom, which changes everytime
          * there's a new randomization
@@ -92,7 +98,6 @@ public class Random {
         io.closeWriteFile();
         return randomizedGroups;
     }
-
     /*
      * In case the user wants to save the groups permanetely, this method is called
      * on to save the file. It creates a file with a name given by the user. I had
@@ -121,39 +126,67 @@ public class Random {
         }
     }
 
-    public void editArray(String names){
-    String currentName;
-    int min = 0;
-    int max = 0;
-    while (namesLeft == true) {
+    public void editArray(String names, String filename){
+    this.fileName = filename; //sets the variable fileName in this class as the String given my app.Java
+    String currentName; 
+    min = 0;
+    max = 0;
+    while (namesLeft == true) { //namesLeft is if there are still names the user has input that haven't been added to the array Block 
         currentName = "";
-        max = names.indexOf("//", min);
-        if (max >= 0) {
-        currentName = names.substring(min, max);
+        max = names.indexOf("//", min); // max has the same index as when // is typed, so that the program gets the substring between min and max (just the name)
+        if (max >= 0) { //if the indexOf max isn't -1 (meaning there is no // in the program, it can set the names to Block)
+        currentName = names.substring(min, max); 
         block[numStudents] = currentName;
         numStudents++;
-        System.out.println(numStudents);
-        min = max + 2;
+        min = max + 2; //because // is two characters long, +2 must be added so the next substring doesn't include //
+        }
+        else {
+        //once max is equal to -1, namesLeft is set to false (because there are none left) and the loop ends, as all the names in the String have been given
+        namesLeft = false;
         }
     }
+    editFile(fileName); //calls the method editFile
     }
+
     public void editFile(String filename){
-        io.openWriteFile(filename);
-        for (int c = 0; c < numStudents; c++){
+        io.openWriteFile(filename); //opens the file the user has given in app.java
+        for (int c = 0; c < numStudents; c++){ //sets each line in the file as one string from block until all the strings have been added
             io.writeToFile(block[c]);
         }
         io.closeWriteFile();
     }
 
     public void deleteFile(String filename){
-        File myFile = new File(filename); 
-        myFile.delete();
+        File myFile = new File(filename); //From what I researched, I needed to create ae file object to use the method myFile.delete
+        myFile.delete(); 
     }
 
     public void renameFile(String filename){
+        //for the sake of abstraction, I put both methods (which use the same file) into rename file
         saveToFile(filename);
         editFile(filename);
     }
-  
-
+  /* Delete names works by finding a string in the array that is completely equal to the name given by the user, and then replacing that name with the last name in the array. This works similarly as editArray but with deleting names instead of them */
+    public void deleteNames(String names){
+     min = 0;
+     while (namesLeft == true) { 
+     currentName = "";
+     max = names.indexOf("//", min); 
+        if (max >= 0) { 
+        currentName = names.substring(min, max); 
+        for (int c = 0; c < numStudents; c++){
+            if (block[c].equals(currentName)){
+                for (int d = 0; d < numStudents; d++){
+                block[c] = block[numStudents - 1];
+                }
+            }
+        }
+     min = max + 2; 
+     numStudents = numStudents - 1; //numStudents must go down becuase the amount of students decreased
+    }else {
+    namesLeft = false;
+        }
+    
+    }
+    }
 }
