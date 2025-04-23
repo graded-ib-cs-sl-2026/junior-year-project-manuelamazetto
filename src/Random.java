@@ -6,9 +6,11 @@ public class Random {
     private int a;
     private int b;
     private int i;
-    private int numStudents = 0;
+    public int numStudents = 0;
+    public Boolean namesLeft = true;
     public String randomizedGroups = "";
     public String currentGroup = "";
+    public String filename = "";
     public String[] block = new String[1000];
     // This array is created with 1000 spaces, however most of them will likely be
     // null, not taking up much space
@@ -34,6 +36,7 @@ public class Random {
         a = 0;
         b = 1;
         // b is set as 1 becuase it's used to label the groups as "Group 1, Group 2, etc
+              // "
         i = 0;
         randomizedGroups = "";
         currentGroup = "";
@@ -61,12 +64,12 @@ public class Random {
         while (i < numStudents) {
             currentGroup += block[i] + ", ";
             a++;
-            if (a == studentsPerTable && i < numStudents - leftoverGroup) {
+            if (a == studentsPerTable && i < numStudents - leftoverGroup - 1) {
                 randomizedGroups += "Group " + b + ": " + currentGroup;
                 currentGroup = "";
                 a = 0;
                 b++;
-
+                
             }
             i++;
         }
@@ -99,9 +102,9 @@ public class Random {
      */
     public Boolean saveToFile(String filename) {
         try {
-            File myObj = new File(filename + ".txt");
-            if (myObj.createNewFile()) {
-                io.openWriteFile(filename + ".txt");
+            File myFile = new File(filename);
+            if (myFile.createNewFile()) {
+                io.openWriteFile(filename);
                 io.writeToFile(randomizedGroups);
                 io.closeWriteFile();
                 return false;
@@ -117,4 +120,40 @@ public class Random {
             return true;
         }
     }
+
+    public void editArray(String names){
+    String currentName;
+    int min = 0;
+    int max = 0;
+    while (namesLeft == true) {
+        currentName = "";
+        max = names.indexOf("//", min);
+        if (max >= 0) {
+        currentName = names.substring(min, max);
+        block[numStudents] = currentName;
+        numStudents++;
+        System.out.println(numStudents);
+        min = max + 2;
+        }
+    }
+    }
+    public void editFile(String filename){
+        io.openWriteFile(filename);
+        for (int c = 0; c < numStudents; c++){
+            io.writeToFile(block[c]);
+        }
+        io.closeWriteFile();
+    }
+
+    public void deleteFile(String filename){
+        File myFile = new File(filename); 
+        myFile.delete();
+    }
+
+    public void renameFile(String filename){
+        saveToFile(filename);
+        editFile(filename);
+    }
+  
+
 }

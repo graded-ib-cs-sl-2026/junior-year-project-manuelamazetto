@@ -13,14 +13,16 @@ public class App {
     private int option = 1;
     // this is used for the user to select what option they would like.
     private String filename = "";
+    private String filename2 = "";
     // This will be used to name the file the user would like to create
     private Boolean fileError = true;
+    private String names = "";
 
     /**
      * Where the program begins!
      */
     public void start() {
-        myRandom = readBlock("block.txt");
+       
         openingMenu();
     }
 
@@ -62,6 +64,10 @@ public class App {
         // int specifies that the line will be an int. If the line is not an int, the
         // program will break
         if (option == 1) {
+            System.out.println("Which class would you like to randomize? Please type in the exact name, not including '.txt'");
+            input.nextLine();
+            filename = input.nextLine();
+            myRandom = readBlock(filename + ".txt");
             System.out.println("How many people would you like per group?");
             studentsPerTable = input.nextInt();
             // studentsPerTable needs to be recorded here, because if it where directly put
@@ -92,7 +98,7 @@ public class App {
             // clarifies that the next one will be a String, not an int
             while (option == 1 && fileError == true) {
                 System.out.println("What would you like to name this file?");
-                filename = input.nextLine();
+                filename = input.nextLine() + ".txt";
                 // this sends the filename chosen by the user into the method, which saves the
                 // groups into a new file
                 fileError = myRandom.saveToFile(filename);
@@ -101,16 +107,48 @@ public class App {
             }
 
         } else if (option == 2) {
-            System.out.println("NA");
+            System.out.println("Which class names would you like to edit?");
+            input.nextLine();
+            filename = input.nextLine() + ".txt";
+            myRandom = readBlock(filename);
+            System.out.println("What names would you like to add? Please seperate them by a //");
+            names = input.nextLine();
+            myRandom.editArray(names + "//");
+            myRandom.editFile(filename);
+
+            
         } else if (option == 3) {
-            System.out.println("NA");
-        } else if (option == 4) {
-            System.out.println("NA");
+            myRandom = new Random();
+            while(fileError == true){
+                System.out.println("What would you like to name your new class?");
+                input.nextLine();
+                filename = input.nextLine() + ".txt";
+                fileError = myRandom.saveToFile(filename);
+            }
+            System.out.println("What names would you like to add? Please seperate them by //");
+            names = input.nextLine();
+            myRandom.editArray(names + "//");
+            myRandom.editFile(filename);
+        }   
+         else if (option == 4) {
+            System.out.println("Which file would you like to rename?");
+            input.nextLine();
+            filename = input.nextLine() + ".txt";
+            myRandom = readBlock(filename);
+            myRandom.deleteFile(filename);
+            System.out.println("What would you like to rename your file?");
+            filename = input.nextLine() + ".txt";
+            myRandom.saveToFile(filename);
+            myRandom.editFile(filename);
+        
+            
         } else {
             System.out.println("That's not an option, please pick [1] [2] [3] [4]");
             openingMenu();
         }
     }
+    
+    
 
     public static void main(String[] args) throws Exception {
         new App().start();
