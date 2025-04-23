@@ -1,0 +1,4 @@
+computer
+waterbottle
+book
+scissors
